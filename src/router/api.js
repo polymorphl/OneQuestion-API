@@ -3,8 +3,25 @@ import models from '../models';
 import isEmail from 'validator/lib/isEmail'; // https://www.npmjs.com/package/validator
 
 const Question = models.Question;
+const Response = models.Response;
+const Owner = models.Owner;
+const Contributor = models.Contributor;
 
 const api = KoaRouter({ prefix: '/v1' });
+
+//Test TOTO move it bottom
+
+api.get('/questions',
+// Handle request: All questions
+async (ctx, next) => {
+  new Question().fetchAll().then(function(data) {
+    ctx.body = { d: data };
+  }).catch(function(error) {
+    console.log('ERR', error);
+  });
+  // ctx.status = 200;
+});
+
 
 /*
 
@@ -101,11 +118,7 @@ async (ctx, next) => {
 });
 
 //DEBUG ROUTES, TODO DELETE FOR PRODUCTION
-api.get('/questions',
-// Handle request: All questions
-async (ctx, next) => {
-  ctx.status = 200;
-});
+
 api.get('/responses',
 // Handle request: All responses
 async (ctx, next) => {

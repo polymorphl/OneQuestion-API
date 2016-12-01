@@ -1,4 +1,4 @@
-import database from '../db/';
+import database from '../db/index';
 
 
 /*
@@ -6,10 +6,12 @@ import database from '../db/';
   Id,
   ownerId,
   contributorId,
-  question
+  question,
+  timestamp X2
 */
 var Question = database.Model.extend({
   tableName: 'question',
+  idAttribute: 'id',
   owner: function() {
     return this.hasOne(Contributor);
   },
@@ -26,10 +28,13 @@ var Question = database.Model.extend({
   # Table: response
   Id,
   contributorId,
-  questionId
+  questionId,
+  response,
+  timestamp X2
 */
 var Response = database.Model.extend({
 tableName: 'response',
+idAttribute: 'id',
 question: function() {
   return this.belongsTo(Question);
 }
@@ -39,10 +44,13 @@ question: function() {
 /*
   # Table: owner
   Id,
-  Shortcode
+  email,
+  Shortcode,
+  timestamp X2
 */
 var Owner = database.Model.extend({
   tableName: 'owner',
+  idAttribute: 'id',
   question: function() {
     return this.belongsTo(Question);
   }
@@ -52,18 +60,21 @@ var Owner = database.Model.extend({
 /*
   # Table: contributor
   Id,
-  ownerId
-  shortcode
+  ownerId,
+  email,
+  shortcode,
+  timestamp X2
 */
 var Contributor = database.Model.extend({
   tableName: 'contributor',
+  idAttribute: 'id',
   owner: function() {
     return this.belongsTo(Owner);
   }
 });
 
 export default {
-  Question,
+  Question: Question,
   Response,
   Owner,
   Contributor

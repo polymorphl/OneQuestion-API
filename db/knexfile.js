@@ -5,7 +5,7 @@ module.exports = {
      host : '127.0.0.1',
      user : 'root',
      password : 'root',
-     database : 'OQ_DB'
+     database : 'oq_db'
    },
    pool: {
       min: 2,
@@ -18,7 +18,7 @@ module.exports = {
      host : '127.0.0.1',
      user : 'root',
      password : 'root',
-     database : 'OQ_DB'
+     database : 'oq_db'
     },
     pool: {
       min: 2,
