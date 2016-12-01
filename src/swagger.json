@@ -1,0 +1,128 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "One Question (OQ)",
+        "description": "Ask the good thing",
+        "version": "1.0.0"
+    },
+    "host": "127.0.0.1:3000",
+    "schemes": [
+        "http"
+    ],
+    "basePath": "/v1",
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/test0": {
+            "get": {
+                "summary": "Bottle Types",
+                "description": "The Bottles endpoint returns information about the *MIAB* bottles\noffered at a given location. The response includes the identifier\nand other details about each bottle, and lists the bottles in the\nproper display order.\n",
+                "parameters": [
+                    {
+                        "name": "latitude",
+                        "in": "query",
+                        "description": "Latitude component of location.",
+                        "required": true,
+                        "type": "number",
+                        "format": "double"
+                    },
+                    {
+                        "name": "longitude",
+                        "in": "query",
+                        "description": "Longitude component of location.",
+                        "required": true,
+                        "type": "number",
+                        "format": "double"
+                    }
+                ],
+                "tags": [
+                    "Bottles"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "An array of bottles",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Bottle"
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/test1": {
+            "get": {
+                "summary": "User Profile",
+                "description": "The User Profile endpoint returns information about the MIAB user that has authorized with the application.",
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Profile information for a user",
+                        "schema": {
+                            "$ref": "#/definitions/Profile"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Bottle": {
+            "type": "object",
+            "properties": {
+                "bottle_id": {
+                    "type": "string",
+                    "description": "Unique identifier representing a specific bottle."
+                },
+                "data": {
+                    "type": "string",
+                    "description": "Text, URL."
+                }
+            }
+        },
+        "Profile": {
+            "type": "object",
+            "properties": {
+                "ownerId": {
+                    "type": "integer",
+                    "description": ""
+                },
+                "email": {
+                    "type": "string",
+                    "description": "Email address of the MIAB user"
+                }
+            }
+        },
+        "Error": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "fields": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
