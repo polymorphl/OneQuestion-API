@@ -1,5 +1,8 @@
 import KoaRouter from 'koa-router';
+import models from '../models';
 import isEmail from 'validator/lib/isEmail'; // https://www.npmjs.com/package/validator
+
+const Question = models.Question;
 
 const api = KoaRouter({ prefix: '/v1' });
 
@@ -8,18 +11,8 @@ const api = KoaRouter({ prefix: '/v1' });
 get / -- X -- Sera fait par le Front
 get /question/:contributorId --  OK
 get /question/:ownerId/admin --  OK
-get /created                 --  OK
 
 */
-
-/*
-  GET - /created
-*/
-api.get('/created',
-// Handle request
-async (ctx, next) => {
- ctx.status = 200;
-});
 
 /*
   GET - /question/:contributorId
@@ -61,7 +54,7 @@ post /question/:ownerId/admin
   - question
 */
 api.post('/create',
-// Handle request
+// Handle request: save the question
 async (ctx, next) => {
   let data = {
     email: (ctx.request.body.email && ctx.request.body.email != "" ? ctx.request.body.email: -1),
@@ -72,7 +65,10 @@ async (ctx, next) => {
     if (isEmail(data.email)) {
       // DB Action HERE
       // Response
-      ctx.body = { error: false, data: 'TODO SAVE IN DB + RESpponse generated token' }
+      ctx.body = {
+        error: false,
+        data: 'TODO SAVE IN DB + RESpponse generated token' + 'ownerId: contributorId:'
+      }
     } else {
       ctx.body = { error: true, data: 'Invalid data' }
     }
@@ -80,7 +76,51 @@ async (ctx, next) => {
     // Response
     ctx.body = { error: true, data: 'Invalid data' }
   }
-
 });
+
+/*
+  POST - /question/:contributorId
+  PARAMS REQUIRED
+  - contributorId
+*/
+api.post('/question/:contributorId',
+// Handle request: new Response to a question
+async (ctx, next) => {
+  ctx.status = 200;
+});
+
+/*
+  POST - /question/:ownerId/admin'
+  PARAMS REQUIRED
+  - ownerId
+*/
+api.post('/question/:ownerId/admin',
+// Handle request: edit question entity
+async (ctx, next) => {
+  ctx.status = 200;
+});
+
+//DEBUG ROUTES, TODO DELETE FOR PRODUCTION
+api.get('/questions',
+// Handle request: All questions
+async (ctx, next) => {
+  ctx.status = 200;
+});
+api.get('/responses',
+// Handle request: All responses
+async (ctx, next) => {
+  ctx.status = 200;
+});
+api.get('/owners',
+// Handle request: All owners
+async (ctx, next) => {
+  ctx.status = 200;
+});
+api.get('/contributors',
+// Handle request: All contributors
+async (ctx, next) => {
+  ctx.status = 200;
+});
+
 
 export default api;
