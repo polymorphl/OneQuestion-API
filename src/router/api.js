@@ -14,8 +14,14 @@ const api = KoaRouter({ prefix: '/v1' });
 api.get('/questions',
 // Handle request: All questions
 async (ctx, next) => {
-  new Question().fetchAll().then(function(data) {
-    ctx.body = { d: data };
+  await new Question().fetchAll({ withRelated: [{
+    'responses': function(qb) {
+      qb.columns('id', 'owner_id', 'question_id', 'response')
+    }
+  }]}).then(function(data) {
+    let resp = data.models;
+    console.log(resp);
+    ctx.body = resp;
   }).catch(function(error) {
     console.log('ERR', error);
   });
