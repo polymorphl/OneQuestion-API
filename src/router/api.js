@@ -16,7 +16,7 @@ api.get('/questions',
 async (ctx, next) => {
   await new Question().fetchAll({ withRelated: [{
     'responses': function(qb) {
-      qb.columns('id', 'owner_id', 'question_id', 'response')
+      qb.columns('id', 'owner_id', 'question_id', 'response', 'firstname')
     }
   }]}).then(function(data) {
     let resp = data.models;
@@ -60,7 +60,6 @@ async (ctx, next) => {
    data: ctx.params.ownerId
  }
 });
-
 
 /* -------------------------------------------------------------------------- */
 
