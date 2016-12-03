@@ -13,7 +13,7 @@ var Question = database.Model.extend({
   tableName: 'question',
   idAttribute: 'id',
   owner: function() {
-    return this.hasOne(Contributor);
+    return this.hasOne(Owner);
   },
   contributor: function() {
     return this.hasOne(Contributor);
@@ -35,24 +35,26 @@ var Question = database.Model.extend({
 var Response = database.Model.extend({
 tableName: 'response',
 idAttribute: 'id',
-question: function() {
-  return this.belongsTo(Question, 'question_id');
-}
+  question: function() {
+    return this.belongsTo(Question, 'question_id');
+  }
 });
 
 
 /*
   # Table: owner
   Id,
+  owner_id,
   email,
+  firstname,
   Shortcode,
   timestamp X2
 */
 var Owner = database.Model.extend({
   tableName: 'owner',
-  idAttribute: 'id',
+  idAttribute: 'owner_id',
   question: function() {
-    return this.belongsTo(Question);
+    return this.belongsTo(Question, 'owner_id');
   }
 });
 
@@ -60,22 +62,23 @@ var Owner = database.Model.extend({
 /*
   # Table: contributor
   Id,
-  ownerId,
+  contributor_id,
   email,
+  firstname,
   shortcode,
   timestamp X2
 */
 var Contributor = database.Model.extend({
   tableName: 'contributor',
-  idAttribute: 'id',
+  idAttribute: 'contributor_id',
   owner: function() {
-    return this.belongsTo(Owner);
+    return this.belongsTo(Owner, 'contributor_id');
   }
 });
 
 export default {
   Question: Question,
-  Response,
-  Owner,
-  Contributor
+  Response: Response,
+  Owner: Owner,
+  Contributor: Contributor
 }

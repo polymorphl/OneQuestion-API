@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS `owner` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `owner_id` varchar(255) NOT NULL COMMENT 'owner ID',
   `email` varchar(255) NOT NULL,
+  `firstname` VARCHAR(32) NOT NULL DEFAULT "" COMMENT 'First Name',
   `created_at` datetime NOT NULL,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
@@ -45,6 +46,7 @@ CREATE TABLE IF NOT EXISTS `contributor` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `contributor_id` varchar(255) NOT NULL COMMENT 'contributor ID',
   `email` varchar(255) NOT NULL,
+  `firstname` VARCHAR(32) NOT NULL DEFAULT "" COMMENT 'First Name',
   `created_at` datetime NOT NULL,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)

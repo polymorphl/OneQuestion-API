@@ -5,7 +5,7 @@ import config from './config';
 import bodyParser from 'koa-bodyparser';
 import views from 'koa-views';
 import cors from 'kcors';
-import router from './router';
+import router from './router/v1';
 import koaSwagger from 'koa2-swagger-ui';
 
 const app = new Koa()
@@ -43,5 +43,5 @@ const app = new Koa()
   /* --- Routes --- API */
   .use(router.api.routes())
   .use(router.api.allowedMethods());
-  
+
 export default app;

@@ -1,4 +1,0 @@
-
-ALTER TABLE `response` ADD `firstname` VARCHAR(32) NULL DEFAULT NULL ;
-
-ALTER TABLE `owner` ADD `firstname` VARCHAR(32) NULL DEFAULT NULL ;
