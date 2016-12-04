@@ -2,6 +2,12 @@
 
 ---
 
+Models here
+
+
+---
+
+
 - [BACK] POST /create (question, email, firstname) => {
 
   //Generate owner_shortcode
@@ -53,7 +59,7 @@
             + Edition de question
             + Cloturer la question
 
-            onClick Edit => POST /question/:mixed_shortcode/edit (question) => {
+            onClick Edit => PUT /question/:mixed_shortcode/edit (question) => {
               SAVE question
                 onBefore, check mixed_shortcode (check owner_shortcode exist and are linked to good share_shortcode )
               return STATE;
