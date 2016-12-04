@@ -34,7 +34,6 @@ var Question = database.Model.extend({
 */
 var Response = database.Model.extend({
 tableName: 'response',
-idAttribute: 'id',
   question: function() {
     return this.belongsTo(Question, 'question_id');
   }

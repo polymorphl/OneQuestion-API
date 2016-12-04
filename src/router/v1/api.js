@@ -16,16 +16,6 @@ const api = KoaRouter({ prefix: '/v1' });
 
 const randomstringLength = 12;
 
-
-
-/*
-
-get / -- X -- Sera fait par le Front
-get /question/:contributorId --  OK
-get /question/:ownerId/admin --  OK
-
-*/
-
 /*
   GET - /question/:contributorId
   PARAMS REQUIRED
@@ -34,16 +24,13 @@ get /question/:ownerId/admin --  OK
 api.get('/question/:contributorId',
 // Handle request
 async (ctx, next) => {
-  await new Contributor({ contributor_id: ctx.params.contributorId }).fetch({ withRelated: [{
-    'owner': function(qb) {
-      qb.columns('owner_id', 'email', 'firstname')
-    }
-  }]}).then(function(data) {
-    let resp = data.models;
-    ctx.body = resp;
-  }).catch(function(error) {
-    console.log('ERR', error);
-  });
+  if (parseInt(ctx.params.contributorId, 10)) {
+    await helper.getQuestion(ctx.params.contributorId, function(code, data) {
+      if (code === 0) {
+        ctx.body  = data;
+      }
+    });
+  }
 });
 
 /*

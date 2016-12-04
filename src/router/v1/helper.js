@@ -36,7 +36,7 @@ async function getResponses(cb) {
   });
 }
 
-function getResponse(id, cb) {
+async function getResponse(id, cb) {
 
 }
 
@@ -53,8 +53,17 @@ async function getQuestions(cb) {
   });
 }
 
-function getQuestion(id, cb) {
-
+async function getQuestion(id, cb) {
+  await new Question({contributor_id: id}).fetch({ withRelated: ['responses']}).then(function(data) {
+    if (data && data.attributes && data.attributes.id) {
+      cb(0, data.attributes);
+    } else {
+      cb (2, 'no data')
+    }
+  }).catch(function(error) {
+    cb(1, error);
+    console.log('ERROR', error);
+  });
 }
 
 async function getOwners(cb) {
@@ -126,6 +135,7 @@ async function getAll(cb) {
 
 export default {
   getQuestions,
+  getQuestion,
   getResponses,
   getOwners,
   getContributors,
