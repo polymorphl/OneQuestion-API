@@ -54,7 +54,8 @@
                   CREATE Contributor(firstname, email, contributor_shortcode, response_id)
                     => (id from contributor)
               return contributor_shortcode;
-              
+
+              - /response/:contributor_shortcode
               - /response/:mixed_shortcode/admin (contributor_shortcode + share_shortcode)
                 onClick Edit => PUT /response/:mixed_shortcode/edit (response) => {
                   SAVE question
