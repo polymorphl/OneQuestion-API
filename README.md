@@ -56,20 +56,20 @@
               return contributor_shortcode;
 
               - /response/:mixed_shortcode/admin (contributor_shortcode + share_shortcode)
-                onClick Edit => PUT /response/:mixed_shortcode/edit (response) => {
-                  SAVE question
-                    onBefore, check mixed_shortcode (check contributor_shortcode exist and are linked to good share_shortcode founded with question_id in contributor table )
-                  return STATE;
-                }
-                onDelete Edit => DELETE /response/:mixed_shortcode/delete => {
-                  via contributor_shortcode (find response_id)
-                    Delete response
-                      Archive response
-                      Archive contributor
-                      Proposer de récupérer résumé en zip par email
-                      return {
-                        redirect to /thankyou and button to go question
-                      }
+                  onClick Edit => PUT /response/:mixed_shortcode/edit (response) => {
+                    SAVE question
+                      onBefore, check mixed_shortcode (check contributor_shortcode exist and are linked to good share_shortcode founded with question_id in contributor table )
+                    return STATE;
+                  onDelete Edit => DELETE /response/:mixed_shortcode/delete => {
+                    via contributor_shortcode (find response_id)
+                      Delete response
+                        Archive response
+                        Archive contributor
+                        Proposer de récupérer résumé en zip par email
+                        return {
+                          redirect to /thankyou and button to go question
+                        }
+                  }
                   return STATE;
                 }
             }
