@@ -24,7 +24,8 @@ const randomstringLength = 12;
 api.get('/question/:contributorId',
 // Handle request
 async (ctx, next) => {
-  if (parseInt(ctx.params.contributorId, 10)) {
+  if (ctx.params.contributorId.toString().length === randomstringLength) {
+    //valid key
     await helper.getQuestion(ctx.params.contributorId, function(code, data) {
       if (code === 0) {
         ctx.body  = data;
@@ -41,6 +42,9 @@ async (ctx, next) => {
 api.get('/question/:ownerId/admin',
 // Handle request
 async (ctx, next) => {
+  if (ctx.params.contributorId.toString().length === randomstringLength) {
+    //valid key
+  }
   await new Owner({ contributor_id: ctx.params.ownerId }).fetch({ withRelated: [{
     'question': function(qb) {
       qb.columns('question_id', 'question')
@@ -84,7 +88,8 @@ async (ctx, next) => {
       // DB Action here!
       await new Question({
         owner_id: ownerToken,
-        contributor_id: contributorToken,
+        // contributor_id: contributorToken,
+        share_id:contributorToken,
         question: data.question,
         created_at: new Date(),
       }).save().then(function(question) {
