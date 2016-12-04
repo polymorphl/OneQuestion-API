@@ -2,8 +2,13 @@
 
 ---
 
-Models here
-
+|      owner      |     question    |      contributor      |        response       |
+|:---------------:|:---------------:|:---------------------:|:---------------------:|
+|   question_id   |        id       |      response_id      |      question_id      |
+| owner_shortcode | owner_shortcode | contributor_shortcode | contributor_shortcode |
+|        id       |     question    |           id          |           id          |
+|    firstname    | share_shortcode |         email         |        response       |
+|      email      |                 |       firstname       |                       |
 
 ---
 
