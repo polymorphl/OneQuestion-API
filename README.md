@@ -54,8 +54,25 @@
                   CREATE Contributor(firstname, email, contributor_shortcode, response_id)
                     => (id from contributor)
               return contributor_shortcode;
+              
+              - /response/:mixed_shortcode/admin (contributor_shortcode + share_shortcode)
+                onClick Edit => PUT /response/:mixed_shortcode/edit (response) => {
+                  SAVE question
+                    onBefore, check mixed_shortcode (check contributor_shortcode exist and are linked to good share_shortcode founded with question_id in contributor table )
+                  return STATE;
+                }
+                onDelete Edit => DELETE /question/:mixed_shortcode/delete => {
+                  via owner_shortcode (find question_id)
+                    Delete response
+                      Archive response
+                      Archive contributor
+                      Proposer de récupérer résumé en zip par email
+                      return {
+                        redirect to /thankyou and button to go question
+                      }
+                  return STATE;
+                }
             }
-
 
         - /question/:mixed_shortcode/admin -> (QUAND TU CLICK)
           // mixed_shortcode = owner_shortcode + share_shortcode
