@@ -19,6 +19,17 @@ function extractAttrs(array) {
   var tmp = [];
   for (var i = 0; i < array.length; i++) {
     tmp.push(array[i].attributes);
+        console.log('Hey', array[i]);
+  }
+  return tmp;
+}
+
+function extractAttrsAndRelation(array) {
+  var tmp = [];
+  for (var i = 0; i < array.length; i++) {
+    let attr = array[i].attributes;
+    attr.relations = array[i].relations;
+    tmp.push(attr);
   }
   return tmp;
 }
@@ -40,23 +51,21 @@ async function getResponse(id, cb) {
 
 }
 
+// Questions + Reponses
 async function getQuestions(cb) {
-  await new Question().fetchAll({ withRelated: [{
-    'responses': function(qb) {
-      qb.columns('owner_id', 'question_id', 'response')
-    }
-  }]}).then(function(data) {
-    cb(0, extractAttrs(data.models));
+  await new Question().fetchAll({ withRelated: ['responses']}).then(function(data) {
+    cb(0, extractAttrsAndRelation(data.models));
   }).catch(function(error) {
     cb(1, error);
     console.log('ERROR', error);
   });
 }
 
+// Question + Reponses
 async function getQuestion(id, cb) {
   await new Question({contributor_id: id}).fetch({ withRelated: ['responses']}).then(function(data) {
     if (data && data.attributes && data.attributes.id) {
-      cb(0, data.attributes);
+      cb(0, data);
     } else {
       cb (2, 'no data')
     }
@@ -65,6 +74,7 @@ async function getQuestion(id, cb) {
     console.log('ERROR', error);
   });
 }
+
 
 async function getOwners(cb) {
   await new Owner().fetchAll().then(function(data) {

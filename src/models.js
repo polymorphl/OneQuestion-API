@@ -11,7 +11,6 @@ import database from '../db/index';
 */
 var Question = database.Model.extend({
   tableName: 'question',
-  idAttribute: 'id',
   owner: function() {
     return this.hasOne(Owner);
   },
@@ -35,7 +34,7 @@ var Question = database.Model.extend({
 var Response = database.Model.extend({
 tableName: 'response',
   question: function() {
-    return this.belongsTo(Question, 'question_id');
+    return this.belongsTo(Question, 'id');
   }
 });
 
