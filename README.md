@@ -61,8 +61,8 @@
                     onBefore, check mixed_shortcode (check contributor_shortcode exist and are linked to good share_shortcode founded with question_id in contributor table )
                   return STATE;
                 }
-                onDelete Edit => DELETE /question/:mixed_shortcode/delete => {
-                  via owner_shortcode (find question_id)
+                onDelete Edit => DELETE /response/:mixed_shortcode/delete => {
+                  via contributor_shortcode (find response_id)
                     Delete response
                       Archive response
                       Archive contributor
