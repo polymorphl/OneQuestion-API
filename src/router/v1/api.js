@@ -1,8 +1,6 @@
 import KoaRouter from 'koa-router';
 import models from '../../models';
 import randomstring from 'randomstring';
-import async from 'async';
-import waterfall from 'async-waterfall';
 import isEmail from 'validator/lib/isEmail'; // https://www.npmjs.com/package/validator
 
 import helper from './helper';

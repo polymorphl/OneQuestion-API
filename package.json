@@ -21,8 +21,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "async": "^2.1.4",
-    "async-waterfall": "^0.1.5",
     "babel-polyfill": "^6.5.0",
     "bookshelf": "^0.9.5",
     "kcors": "^2.0.0",
