@@ -202,31 +202,15 @@ async (ctx, next) => {
   });
 });
 
-let DB_obj = {};
+
 api.get('/getall',
 // Handle request: All data for admin dashboard
 async (ctx, next) => {
-  await helper.getContributors(function(code, data) {
+  await helper.getAll(function(code, data) {
     if (code === 0) {
-      DB_obj.contributors = data;
+      ctx.body = { error: false, data: data }
     }
   });
-  await helper.getOwners(function(code, data) {
-    if (code === 0) {
-      DB_obj.owners = data;
-    }
-  });
-  await helper.getResponses(function(code, data) {
-    if (code === 0) {
-      DB_obj.responses = data;
-    }
-  });
-  await helper.getQuestions(function(code, data) {
-    if (code === 0) {
-      DB_obj.questions = data;
-    }
-  });
-  ctx.body = DB_obj;
 });
 
 export default api;

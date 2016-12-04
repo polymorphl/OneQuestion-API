@@ -99,10 +99,35 @@ function createResponse() {
 
 }
 
+async function getAll(cb) {
+  let DB_obj = {};
+  await getContributors(function(code, data) {
+    if (code === 0) {
+      DB_obj.contributors = data;
+    }
+  });
+  await getOwners(function(code, data) {
+    if (code === 0) {
+      DB_obj.owners = data;
+    }
+  });
+  await getResponses(function(code, data) {
+    if (code === 0) {
+      DB_obj.responses = data;
+    }
+  });
+  await getQuestions(function(code, data) {
+    if (code === 0) {
+      DB_obj.questions = data;
+    }
+  });
+  cb(0, DB_obj);
+}
 
 export default {
   getQuestions,
   getResponses,
   getOwners,
-  getContributors
+  getContributors,
+  getAll
 };
