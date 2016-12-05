@@ -4,8 +4,8 @@ import database from '../db/index';
 /*
   # Table: question
   Id,
-  ownerId,
-  contributorId,
+  owner_shortcode,
+  share_shortcode,
   question,
   timestamp X2
 */
@@ -26,13 +26,16 @@ var Question = database.Model.extend({
 /*
   # Table: response
   Id,
-  contributorId,
-  questionId,
+  question_id,
+  contributor_shortcode,
   response,
   timestamp X2
 */
 var Response = database.Model.extend({
-tableName: 'responses',
+  tableName: 'responses',
+  contributor: function() {
+    return this.belongsTo(Contributor, 'contributor_shortcode');
+  },
   question: function() {
     return this.belongsTo(Question, 'id');
   }
@@ -42,15 +45,15 @@ tableName: 'responses',
 /*
   # Table: owner
   Id,
-  owner_id,
-  email,
+  question_id,
+  owner_shortcode,
   firstname,
-  Shortcode,
+  email,
   timestamp X2
 */
 var Owner = database.Model.extend({
   tableName: 'owners',
-  idAttribute: 'owner_id',
+  idAttribute: 'owner_shortcode',
   question: function() {
     return this.belongsTo(Question, 'id');
   }
@@ -60,17 +63,17 @@ var Owner = database.Model.extend({
 /*
   # Table: contributor
   Id,
-  contributor_id,
+  response_id,
+  contributor_shortcode,
   email,
   firstname,
-  shortcode,
   timestamp X2
 */
 var Contributor = database.Model.extend({
   tableName: 'contributors',
-  idAttribute: 'contributor_id',
-  owner: function() {
-    return this.belongsTo(Owner, 'contributor_id');
+  idAttribute: 'contributor_shortcode',
+  response: function() {
+    return this.belongsTo(Response, 'id');
   }
 });
 

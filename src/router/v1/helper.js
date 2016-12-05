@@ -19,7 +19,6 @@ function extractAttrs(array) {
   var tmp = [];
   for (var i = 0; i < array.length; i++) {
     tmp.push(array[i].attributes);
-        console.log('Hey', array[i]);
   }
   return tmp;
 }
@@ -35,12 +34,8 @@ function extractAttrsAndRelation(array) {
 }
 
 async function getResponses(cb) {
-  await new Response().fetchAll({ withRelated: [{
-    'question': function(qb) {
-      qb.columns('owner_id', 'question')
-    }
-  }]}).then(function(data) {
-    cb(0, extractAttrs(data.models));
+  await new Response().fetchAll({ withRelated: ['contributor', 'question']}).then(function(data) {
+    cb(0, extractAttrsAndRelation(data.models));
   }).catch(function(error) {
     cb(1, error);
     console.log('ERROR', error);
@@ -53,7 +48,7 @@ async function getResponse(id, cb) {
 
 // Questions + Reponses
 async function getQuestions(cb) {
-  await new Question().fetchAll({ withRelated: ['responses']}).then(function(data) {
+  await new Question().fetchAll({ withRelated: ['responses', 'owner', 'responses.contributor']}).then(function(data) {
     cb(0, extractAttrsAndRelation(data.models));
   }).catch(function(error) {
     cb(1, error);
@@ -77,8 +72,8 @@ async function getQuestion(id, cb) {
 
 
 async function getOwners(cb) {
-  await new Owner().fetchAll().then(function(data) {
-    cb(0, extractAttrs(data.models));
+  await new Owner().fetchAll({ withRelated: ['question']}).then(function(data) {
+    cb(0, extractAttrsAndRelation(data.models));
   }).catch(function(error) {
     cb(1, error);
     console.log('ERROR', error);
@@ -90,8 +85,8 @@ function getOwner(id, cb) {
 }
 
 async function getContributors(cb) {
-  await new Contributor().fetchAll().then(function(data) {
-    cb(0, extractAttrs(data.models));
+  await new Contributor().fetchAll({ withRelated: ['response']}).then(function(data) {
+    cb(0, extractAttrsAndRelation(data.models));
   }).catch(function(error) {
     cb(1, error);
     console.log('ERROR', error);

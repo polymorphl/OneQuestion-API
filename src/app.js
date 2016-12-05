@@ -19,7 +19,7 @@ const app = new Koa()
     var start = new Date;
     await next;
     var ms = new Date - start;
-    console.log('%s %s - %s', ctx.method, ctx.url, ms);
+    console.log('%s %s - %sms', ctx.method, ctx.url, ms);
     await next();
   })
   .use(koaSwagger({ /* For Documentation: */
