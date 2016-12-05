@@ -22,6 +22,7 @@
   "license": "ISC",
   "dependencies": {
     "babel-polyfill": "^6.5.0",
+    "bluebird": "^3.4.6",
     "bookshelf": "^0.9.5",
     "kcors": "^2.0.0",
     "knex": "^0.11.1",

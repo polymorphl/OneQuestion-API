@@ -6,7 +6,7 @@ const nodemailer = require('nodemailer');
 
 var transport = nodemailer.createTransport(conf[env]);
 
-function sendEmail(from, to, subject, context, cb) {
+async function sendEmail(from, to, subject, context, cb) {
   let opt = {
     from: from,
     to: to,
@@ -15,13 +15,12 @@ function sendEmail(from, to, subject, context, cb) {
     html: '<b>test Email</b>'
   };
 
-  transport.sendMail(opt, function(err, info) {
+  await transport.sendMail(opt, function(err, info) {
     if (err) {
       return console.log(err);
     }
-    console.log('Email send: ' + info.response);
-    cb(0, info);
+    return cb(0, info);
   });
 }
 
-module.exports = sendEmail;
+export default sendEmail;

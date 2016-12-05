@@ -16,19 +16,25 @@ const api = KoaRouter({ prefix: '/v1' });
 
 const randomstringLength = 12;
 
+//Trick the system NOW!
+const owner_shortcode_length = 12;
+const share_shortcode_length = 12;
+const contributor_shortcode_length = 12;
+const mixed_shortcode = 14; // Add magic 2 chars on random generated position ?
+
 /*
   GET - /question/:contributorId
   PARAMS REQUIRED
   - :contributorId
 */
-api.get('/question/:contributorId',
+api.get('/question/:share_shortcode',
 // Handle request
 async (ctx, next) => {
-  if (ctx.params.contributorId.toString().length === randomstringLength) {
+  if (ctx.params.share_shortcode.toString().length === 4) {
     //valid key
-    await helper.getQuestion(ctx.params.contributorId, function(code, data) {
-      if (code === 0) {
-        ctx.body  = data;
+    await helper.getQuestionByShareShortcode(ctx.params.share_shortcode, function(c, d) {
+      if (c === 0) {
+        ctx.body  = d;
       }
     });
   }
@@ -82,43 +88,37 @@ async (ctx, next) => {
   if (!parseInt(data.email, 10) && !parseInt(data.question, 10) && !parseInt(data.firstname, 10)) {
     //check email
     if (isEmail(data.email)) {
-      // Generate token here!
+      // Generate tokens
       let ownerToken = randomstring.generate(randomstringLength);
       let contributorToken = randomstring.generate(randomstringLength);
+      let question_data = {};
+      let owner_data = {};
+      let email_data = {};
       // DB Action here!
-      await new Question({
-        owner_id: ownerToken,
-        // contributor_id: contributorToken,
-        share_id:contributorToken,
-        question: data.question,
-        created_at: new Date(),
-      }).save().then(function(question) {
-        console.log(question.attributes);
-        let context = {
-          ownerid:  question.attributes.owner_id,
-          contributorid: question.attributes.contributor_id
+      await helper.createQuestion(ownerToken, contributorToken, data.question, function(c, d) {
+        if (c === 0) {
+          question_data = d;
+        } else {
+          ctx.body = { error: true, data: 'Cannot create question' }
         }
-        //TODO finish helper.js + send correct email
-        // sendEmail('lucterracher@lecrew.bdx', data.email, '[One Question] your links', context, function(code, emailResponse) {
-        //   if (code === 0) {
-        // ctx.body = {
-        //   error: false,
-        //   owner_id: context.ownerid,
-        //   contributor_id: context.contributorid
-        // }
-        //     console.log(`Email has been send to ${data.email}`, emailResponse.response);
-        //   }
-        // })
-
-        // Response
-        ctx.body = {
-          error: false,
-          owner_id: context.ownerid,
-          contributor_id: context.contributorid
-        }
-      }).catch(function(error) {
-        console.log('Question cannot be created', error);
       });
+      await helper.createOwner(question_data.id, question_data.owner_shortcode, data.email, data.firstname, function(c, d) {
+        if (c === 0) {
+          owner_data = d;
+        } else {
+          ctx.body = { error: true, data: 'Cannot create owner' }
+        }
+      });
+      await sendEmail('lucterracher@lecrew.bdx', data.email, '[One Question] your links', owner_data, function(c, d) {
+        if (c === 0) {
+          console.log('NEW EMAIL SENT (on mailtrap.io in DEV)=>', d.envelope);
+        } else {
+          console.log('Mail not send');
+        }
+      });
+      ctx.body = {
+        error: false
+      }
     } else {
       ctx.body = { error: true, data: 'Invalid data' }
     }

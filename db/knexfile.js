@@ -5,7 +5,8 @@ module.exports = {
      host : '127.0.0.1',
      user : 'root',
      password : 'root',
-     database : 'oq_db'
+     database : 'oq_db',
+     charset: 'utf8'
    },
    pool: {
       min: 2,
@@ -18,7 +19,8 @@ module.exports = {
      host : '127.0.0.1',
      user : 'root',
      password : 'root',
-     database : 'oq_db'
+     database : 'oq_db',
+     charset: 'utf8'
     },
     pool: {
       min: 2,

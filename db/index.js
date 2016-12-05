@@ -6,4 +6,6 @@ const knex = require('knex')(file[env]);
 
 const bookshelf = require('bookshelf')(knex);
 
+bookshelf.plugin('virtuals');
+
 export default bookshelf;

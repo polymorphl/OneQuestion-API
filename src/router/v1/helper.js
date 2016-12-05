@@ -34,7 +34,9 @@ function extractAttrsAndRelation(array) {
 }
 
 async function getResponses(cb) {
-  await new Response().fetchAll({ withRelated: ['contributor', 'question']}).then(function(data) {
+  await new Response().fetchAll({ withRelated:
+    ['contributor', 'question']
+  }).then(function(data) {
     cb(0, extractAttrsAndRelation(data.models));
   }).catch(function(error) {
     cb(1, error);
@@ -48,7 +50,9 @@ async function getResponse(id, cb) {
 
 // Questions + Reponses
 async function getQuestions(cb) {
-  await new Question().fetchAll({ withRelated: ['responses', 'owner', 'responses.contributor']}).then(function(data) {
+  await new Question().fetchAll({ withRelated:
+    ['responses', 'owner', 'responses.contributor']
+  }).then(function(data) {
     cb(0, extractAttrsAndRelation(data.models));
   }).catch(function(error) {
     cb(1, error);
@@ -56,9 +60,12 @@ async function getQuestions(cb) {
   });
 }
 
-// Question + Reponses
-async function getQuestion(id, cb) {
-  await new Question({contributor_id: id}).fetch({ withRelated: ['responses']}).then(function(data) {
+/*
+** == id
+** => Question, Owner + (Reponses + contributor)
+*/
+async function getQuestionByShareShortcode(id, cb) {
+  await new Question().byShare_shortcode(id).then(function(data) {
     if (data && data.attributes && data.attributes.id) {
       cb(0, data);
     } else {
@@ -72,7 +79,9 @@ async function getQuestion(id, cb) {
 
 
 async function getOwners(cb) {
-  await new Owner().fetchAll({ withRelated: ['question']}).then(function(data) {
+  await new Owner().fetchAll({ withRelated:
+    ['question']
+  }).then(function(data) {
     cb(0, extractAttrsAndRelation(data.models));
   }).catch(function(error) {
     cb(1, error);
@@ -80,12 +89,14 @@ async function getOwners(cb) {
   });
 }
 
-function getOwner(id, cb) {
+async function getOwner(id, cb) {
 
 }
 
 async function getContributors(cb) {
-  await new Contributor().fetchAll({ withRelated: ['response']}).then(function(data) {
+  await new Contributor().fetchAll({ withRelated:
+    ['response']
+  }).then(function(data) {
     cb(0, extractAttrsAndRelation(data.models));
   }).catch(function(error) {
     cb(1, error);
@@ -93,23 +104,44 @@ async function getContributors(cb) {
   });
 }
 
-function getContributor(id, cb) {
+async function getContributor(id, cb) {
 
 }
 
-function createQuestion() {
+async function createQuestion(ownerToken, contributorToken, question, cb) {
+  await new Question({
+    owner_shortcode: ownerToken,
+    share_shortcode:contributorToken,
+    question: question,
+    created_at: new Date()
+  }).save().then(function(question) {
+    cb(0, question.attributes);
+  }).catch(function(error) {
+    console.log('Question cannot be created', error);
+    cb(1, 'Question cannot be insert');
+  });
+}
+
+async function createOwner(question_id, owner_shortcode, email, firstname, cb) {
+  await new Owner({
+    question_id: question_id,
+    owner_shortcode: owner_shortcode,
+    email: email,
+    firstname: firstname,
+    created_at: new Date()
+  }).save().then(function(owner) {
+    cb(0, owner.attributes);
+  }).catch(function(error) {
+    console.log('Owner cannot be created', error);
+    cb(1, 'Owner cannot be insert');
+  });
+}
+
+async function createContributor() {
 
 }
 
-function createOwner() {
-
-}
-
-function createContributor() {
-
-}
-
-function createResponse() {
+async function createResponse() {
 
 }
 
@@ -140,9 +172,11 @@ async function getAll(cb) {
 
 export default {
   getQuestions,
-  getQuestion,
+  getQuestionByShareShortcode,
   getResponses,
   getOwners,
   getContributors,
-  getAll
+  getAll,
+  createQuestion,
+  createOwner
 };

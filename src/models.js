@@ -1,5 +1,5 @@
 import database from '../db/index';
-
+var Promise = require('bluebird');
 
 /*
   # Table: question
@@ -9,8 +9,29 @@ import database from '../db/index';
   question,
   timestamp X2
 */
+
 var Question = database.Model.extend({
   tableName: 'questions',
+  virtuals: {
+    // For disabled: instance.toJSON({virtuals: true})
+    mixed_shortcode: function() {
+        return this.get('owner_shortcode') + this.get('share_shortcode');
+    }
+  },
+  /* Methods */
+  byOwner_shortcode: Promise.method(function(owner_shortcode) {
+     return this.forge().query({where:{ owner_shortcode: owner_shortcode }}).fetch(
+       { withRelated:
+         ['responses', 'owner', 'responses.contributor']
+       });
+  }),
+  byShare_shortcode: Promise.method(function(share_shortcode) {
+    return this.query({where:{ share_shortcode: share_shortcode }}).fetch(
+      { withRelated:
+        ['responses', 'owner', 'responses.contributor']
+      });
+  }),
+ /* Relations */
   owner: function() {
     return this.hasOne(Owner);
   },
@@ -33,6 +54,14 @@ var Question = database.Model.extend({
 */
 var Response = database.Model.extend({
   tableName: 'responses',
+  /* Methods */
+  byQuestion_id: Promise.method(function(question_id) {
+     return this.forge().query({where:{ question_id: question_id }}).fetch();
+  }),
+  byContributor_shortcode: Promise.method(function(contributor_shortcode) {
+     return this.forge().query({where:{ contributor_shortcode: contributor_shortcode }}).fetch();
+  }),
+  /* Relations */
   contributor: function() {
     return this.belongsTo(Contributor, 'contributor_shortcode');
   },
@@ -53,7 +82,24 @@ var Response = database.Model.extend({
 */
 var Owner = database.Model.extend({
   tableName: 'owners',
-  idAttribute: 'owner_shortcode',
+  idAttribute: 'id',
+  /* Methods */
+  byQuestion_id: Promise.method(function(question_id) {
+     return this.forge().query({where:{ question_id: question_id }}).fetch({ withRelated:
+       []
+     });
+  }),
+  byOwner_shortcode: Promise.method(function(owner_shortcode) {
+     return this.forge().query({where:{ owner_shortcode: owner_shortcode }}).fetch({ withRelated:
+       []
+     });
+  }),
+  byEmail: Promise.method(function(email) {
+    return this.forge().query({where:{ email: email }}).fetch({ withRelated:
+      []
+    });
+  }),
+  /* Relations */
   question: function() {
     return this.belongsTo(Question, 'id');
   }
@@ -72,6 +118,17 @@ var Owner = database.Model.extend({
 var Contributor = database.Model.extend({
   tableName: 'contributors',
   idAttribute: 'contributor_shortcode',
+  /* Methods */
+  byContributor_shortcode: Promise.method(function(contributor_shortcode) {
+     return this.forge().query({where:{ contributor_shortcode: contributor_shortcode }}).fetch();
+  }),
+  byResponse_id: Promise.method(function(response_id) {
+    return this.forge().query({where:{ response_id: response_id }}).fetch();
+  }),
+  byEmail: Promise.method(function(email) {
+    return this.forge().query({where:{ email: email }}).fetch();
+  }),
+  /* Relations */
   response: function() {
     return this.belongsTo(Response, 'id');
   }
