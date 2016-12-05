@@ -1,54 +1,56 @@
 /*DATABASE*/
 CREATE DATABASE IF NOT EXISTS oq_db;
 
-/*TABLES*/
+/*
+  TABLES
+*/
 
-/* question */
-CREATE TABLE IF NOT EXISTS `question` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `owner_id` varchar(255) NOT NULL COMMENT 'owner ID',
-  `contributor_id` varchar(255) NOT NULL COMMENT 'contributor ID',
+/* questions */
+CREATE TABLE IF NOT EXISTS `questions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'question ID',
+  `owner_shortcode` varchar(32) NOT NULL COMMENT 'owner Shortcode',
+  `share_shortcode` varchar(32) NOT NULL COMMENT 'share Shortcode',
   `question` varchar(255) NOT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-ALTER TABLE  `question` ADD INDEX (`id`);
+ALTER TABLE  `questions` ADD INDEX (`id`);
 
-
-/* response */
-CREATE TABLE IF NOT EXISTS `response` (
+/* responses */
+CREATE TABLE IF NOT EXISTS `responses` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `owner_id` varchar(255) NOT NULL COMMENT 'owner ID',
   `question_id` varchar(255) NOT NULL COMMENT 'question ID',
+  `contributor_shortcode` varchar(32) NOT NULL COMMENT 'contributor Shortcode',
   `response` varchar(255) NOT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-ALTER TABLE  `response` ADD INDEX (`id`);
+ALTER TABLE  `responses` ADD INDEX (`id`);
 
-
-/* owner */
-CREATE TABLE IF NOT EXISTS `owner` (
+/* owners */
+CREATE TABLE IF NOT EXISTS `owners` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `owner_id` varchar(255) NOT NULL COMMENT 'owner ID',
+  `question_id` varchar(32) NOT NULL COMMENT 'question ID',
+  `owner_shortcode` varchar(32) NOT NULL COMMENT 'owner Shortcode',
+  `firstname` VARCHAR(32) NOT NULL DEFAULT "" COMMENT 'First Name',
+  `email` varchar(255) NOT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+ALTER TABLE  `owners` ADD INDEX (`id`);
+
+/* contributors */
+CREATE TABLE IF NOT EXISTS `contributors` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `response_id` varchar(32) NOT NULL COMMENT 'response ID',
+  `contributor_shortcode` varchar(32) NOT NULL COMMENT 'contributor Shortcode',
   `email` varchar(255) NOT NULL,
   `firstname` VARCHAR(32) NOT NULL DEFAULT "" COMMENT 'First Name',
   `created_at` datetime NOT NULL,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-ALTER TABLE  `owner` ADD INDEX (`id`);
-
-/* contributor */
-CREATE TABLE IF NOT EXISTS `contributor` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `contributor_id` varchar(255) NOT NULL COMMENT 'contributor ID',
-  `email` varchar(255) NOT NULL,
-  `firstname` VARCHAR(32) NOT NULL DEFAULT "" COMMENT 'First Name',
-  `created_at` datetime NOT NULL,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-ALTER TABLE  `contributor` ADD INDEX (`id`);
+ALTER TABLE  `contributors` ADD INDEX (`id`);

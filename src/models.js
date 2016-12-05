@@ -10,7 +10,7 @@ import database from '../db/index';
   timestamp X2
 */
 var Question = database.Model.extend({
-  tableName: 'question',
+  tableName: 'questions',
   owner: function() {
     return this.hasOne(Owner);
   },
@@ -32,7 +32,7 @@ var Question = database.Model.extend({
   timestamp X2
 */
 var Response = database.Model.extend({
-tableName: 'response',
+tableName: 'responses',
   question: function() {
     return this.belongsTo(Question, 'id');
   }
@@ -49,10 +49,10 @@ tableName: 'response',
   timestamp X2
 */
 var Owner = database.Model.extend({
-  tableName: 'owner',
+  tableName: 'owners',
   idAttribute: 'owner_id',
   question: function() {
-    return this.belongsTo(Question, 'owner_id');
+    return this.belongsTo(Question, 'id');
   }
 });
 
@@ -67,7 +67,7 @@ var Owner = database.Model.extend({
   timestamp X2
 */
 var Contributor = database.Model.extend({
-  tableName: 'contributor',
+  tableName: 'contributors',
   idAttribute: 'contributor_id',
   owner: function() {
     return this.belongsTo(Owner, 'contributor_id');
