@@ -90,12 +90,15 @@ async (ctx, next) => {
     if (isEmail(data.email)) {
       // Generate tokens
       let ownerToken = randomstring.generate(randomstringLength);
-      let contributorToken = randomstring.generate(randomstringLength);
+      let shareToken = randomstring.generate(randomstringLength);
       let question_data = {};
       let owner_data = {};
-      let email_data = {};
+      let all = {
+        share_shortcode: shareToken,
+        mixed_shortcode: (ownerToken + shareToken)
+      };
       // DB Action here!
-      await helper.createQuestion(ownerToken, contributorToken, data.question, function(c, d) {
+      await helper.createQuestion(ownerToken, shareToken, data.question, function(c, d) {
         if (c === 0) {
           question_data = d;
         } else {
@@ -109,7 +112,7 @@ async (ctx, next) => {
           ctx.body = { error: true, data: 'Cannot create owner' }
         }
       });
-      await sendEmail('lucterracher@lecrew.bdx', data.email, '[One Question] your links', owner_data, function(c, d) {
+      await sendEmail('lucterracher@lecrew.bdx', data.email, '[One Question] your links', all, function(c, d) {
         if (c === 0) {
           console.log('NEW EMAIL SENT (on mailtrap.io in DEV)=>', d.envelope);
         } else {
@@ -117,7 +120,8 @@ async (ctx, next) => {
         }
       });
       ctx.body = {
-        error: false
+        error: false,
+        owner_data: owner_data
       }
     } else {
       ctx.body = { error: true, data: 'Invalid data' }
