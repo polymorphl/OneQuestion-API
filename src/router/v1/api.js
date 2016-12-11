@@ -95,7 +95,8 @@ async (ctx, next) => {
       let owner_data = {};
       let all = {
         share_shortcode: shareToken,
-        mixed_shortcode: (ownerToken + shareToken)
+        mixed_shortcode: (ownerToken + shareToken),
+        templateFile: 'welcome'
       };
       // DB Action here!
       await helper.createQuestion(ownerToken, shareToken, data.question, function(c, d) {
@@ -121,7 +122,8 @@ async (ctx, next) => {
       });
       ctx.body = {
         error: false,
-        owner_data: owner_data
+        owner_data: owner_data,
+        share_shortcode: shareToken
       }
     } else {
       ctx.body = { error: true, data: 'Invalid data' }

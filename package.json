@@ -12,12 +12,7 @@
     "type": "git",
     "url": "git+https://github.com/polymorphl/MessageInABottle.git"
   },
-  "keywords": [
-    "message",
-    "in",
-    "a",
-    "bottle"
-  ],
+  "keywords": [ "one", "question"],
   "author": "",
   "license": "ISC",
   "dependencies": {
