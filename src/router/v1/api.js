@@ -142,7 +142,9 @@ async (ctx, next) => {
 api.post('/question/:contributorId',
 // Handle request: new Response to a question
 async (ctx, next) => {
-  ctx.status = 200;
+    ctx.body = {
+        error: false
+    }
 });
 
 /*
@@ -153,7 +155,9 @@ async (ctx, next) => {
 api.post('/question/:ownerId/admin',
 // Handle request: edit question entity
 async (ctx, next) => {
-  ctx.status = 200;
+    ctx.body = {
+        error: false
+    }
 });
 
 
