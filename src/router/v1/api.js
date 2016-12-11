@@ -30,7 +30,7 @@ const mixed_shortcode = 14; // Add magic 2 chars on random generated position ?
 api.get('/question/:share_shortcode',
 // Handle request
 async (ctx, next) => {
-  if (ctx.params.share_shortcode.toString().length === 4) {
+  if (ctx.params.share_shortcode.toString().length === share_shortcode_length) {
     //valid key
     await helper.getQuestionByShareShortcode(ctx.params.share_shortcode, function(c, d) {
       if (c === 0) {
