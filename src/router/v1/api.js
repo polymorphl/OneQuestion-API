@@ -20,19 +20,20 @@ const randomstringLength = 12;
 const owner_shortcode_length = 12;
 const share_shortcode_length = 12;
 const contributor_shortcode_length = 12;
-const mixed_shortcode = 14; // Add magic 2 chars on random generated position ?
+const mixed_shortcode_length = 24; // ??? Add magic 2 chars on random generated position ?
 
 /*
-  GET - /question/:contributorId
+  GET - /question/:contributor_shortcode
   PARAMS REQUIRED
-  - :contributorId
+  - :contributor_shortcode
 */
 api.get('/question/:share_shortcode',
 // Handle request
 async (ctx, next) => {
   if (ctx.params.share_shortcode.toString().length === share_shortcode_length) {
     //valid key
-    await helper.getQuestionByShareShortcode(ctx.params.share_shortcode, function(c, d) {
+    await helper.getQuestionByShareShortcode(ctx.params.share_shortcode,
+    ['responses', 'owner', 'responses.contributor'], function(c, d) {
       if (c === 0) {
         ctx.body  = d;
       }
@@ -41,9 +42,9 @@ async (ctx, next) => {
 });
 
 /*
-  GET - /question/:ownerId/admin
+  GET - /question/:mixed_shortcode/admin
   PARAMS REQUIRED
-  - :ownerId
+  - :mixed_shortcode
 */
 api.get('/question/:ownerId/admin',
 // Handle request
@@ -66,12 +67,7 @@ async (ctx, next) => {
 /* -------------------------------------------------------------------------- */
 
 /*
-post /create         (2)
-post /question/:contributorId
-post /question/:ownerId/admin
-*/
-
-/*
+ { DONE }
   POST - /create
   PARAMS BODY REQUIRED
   - email
@@ -98,6 +94,7 @@ async (ctx, next) => {
         mixed_shortcode: (ownerToken + shareToken),
         templateFile: 'welcome'
       };
+
       // DB Action here!
       await helper.createQuestion(ownerToken, shareToken, data.question, function(c, d) {
         if (c === 0) {
@@ -113,6 +110,11 @@ async (ctx, next) => {
           ctx.body = { error: true, data: 'Cannot create owner' }
         }
       });
+
+       // TODO checks if 2 requests has been done
+
+
+      // Email
       await sendEmail('lucterracher@lecrew.bdx', data.email, '[One Question] your links', all, function(c, d) {
         if (c === 0) {
           console.log('NEW EMAIL SENT (on mailtrap.io in DEV)=>', d.envelope);
@@ -135,35 +137,253 @@ async (ctx, next) => {
 });
 
 /*
-  POST - /question/:contributorId
+  { DONE }
+  POST - /question/:share_shortcode
   PARAMS REQUIRED
-  - contributorId
+  - share_shortcode
 */
-api.post('/question/:contributorId',
+api.post('/question/:share_shortcode',
 // Handle request: new Response to a question
 async (ctx, next) => {
-    ctx.body = {
-        error: false
+ let data = {
+    email: (ctx.request.body.email && ctx.request.body.email != "" ? ctx.request.body.email: -1),
+    firstname: (ctx.request.body.firstname && ctx.request.body.firstname != "" ? ctx.request.body.firstname: -1),
+    response: (ctx.request.body.response && ctx.request.body.response != "" ? ctx.request.body.response: -1)
+  }
+  let share_shortcode = ctx.params.share_shortcode;
+ 
+  if (share_shortcode.length === share_shortcode_length) {
+     // Valid length for share_shortcode
+    if (!parseInt(data.email, 10) && !parseInt(data.response, 10) && !parseInt(data.firstname, 10)) {
+      //check email
+      if (isEmail(data.email)) {
+         // Generate tokens
+        let contributorToken = randomstring.generate(contributor_shortcode_length);
+        let context = {
+          share_shortcode: share_shortcode,
+          contributor: {},
+          question: {},
+          response: {}
+        }
+
+        // DB Action here!
+        await helper.getQuestionByShareShortcode(share_shortcode, [], function(c, d){
+          if (c === 0) {
+            context.question = d.attributes;
+            // Delete unused variable (TODO remove columns in bookshelf)
+            delete context.question.owner_shortcode;
+          } else {
+            ctx.body = { error: true, data: 'Cannot find related question' }
+          }
+        });
+        
+        if (parseInt(context.question.id)) {
+          // a valid ID is given after resolve
+          // DB Action here!
+          await helper.createResponse(context.question.id,
+                                    contributorToken, data.response, function(c, d) {
+            if (c === 0) {
+              context.response = d;
+            } else {
+              ctx.body = { error: true, data: 'Cannot create response' }
+            }
+          });
+          await helper.createContributor(context.response.id, contributorToken, data.email, data.firstname, function(c, d) {
+            if (c === 0) {
+              context.contributor = d;
+            } else {
+              ctx.body = { error: true, data: 'Cannot create contributor' }
+            }
+          });
+
+          // TODO checks if 2 requests has been done
+
+          // Email
+          let emailVars = {
+            contributor_shortcode: contributorToken,
+            mixed_shortcode: contributorToken + share_shortcode,
+            templateFile: 'welcome_contributor'
+          }
+          await sendEmail('lucterracher@lecrew.bdx', data.email, '[One Question] your links', emailVars, function(c, d) {
+            if (c === 0) {
+              console.log('NEW EMAIL SENT (on mailtrap.io in DEV)=>', d.envelope);
+            } else {
+              console.log('Mail not send');
+            }
+          });
+
+          // Response
+          ctx.body = {
+            error: false,
+            data: {
+              contributor_shortcode: contributorToken,
+              question: context.question,
+            }
+          }
+        } else {
+          ctx.body = { error: true, data: 'The related question cannot be found' }
+        }
+      } else {
+        ctx.body = { error: true, data: 'Invalid data' }
+      }
+    } else {
+      ctx.body = { error: true, data: 'Invalid data' }
     }
+  } else {
+    ctx.body = { error: true, data: 'Invalid data' }
+  }
+
 });
+
 
 /*
-  POST - /question/:ownerId/admin'
+  POST - /question/:mixed_shortcode/admin'
   PARAMS REQUIRED
-  - ownerId
+  - mixed_shortcode (owner_shortcode + share_shortcode)
 */
-api.post('/question/:ownerId/admin',
+api.post('/question/:mixed_shortcode/edit',
 // Handle request: edit question entity
 async (ctx, next) => {
-    ctx.body = {
-        error: false
+    let data = {
+      question: (ctx.request.body.question && ctx.request.body.question != "" ? ctx.request.body.question : -1)
+    }
+    let mixed_shortcode = ctx.params.mixed_shortcode;
+
+    // TODO find share_shortcode
+    let share_shortcode = helper.extractMixed(mixed_shortcode)[1];
+
+    if (mixed_shortcode.length === mixed_shortcode_length) {
+     // Valid length for share_shortcode
+      if (!parseInt(data.question, 10)) {
+        // Valid data
+        let context = {
+          question: {},
+          edited: null
+        }
+
+        // DB Action here!
+        await helper.getQuestionByShareShortcode(share_shortcode, [], function(c, d){
+          if (c === 0) {
+            context.question = d.attributes;
+            // Delete unused variable (TODO remove columns in bookshelf)
+            
+          } else {
+            ctx.body = { error: true, data: 'Cannot find related question' }
+          }
+        });
+
+        if (context.question.owner_shortcode === helper.extractMixed(mixed_shortcode)[0]) {
+          // question is link to owner_shortcode received in params
+          delete context.question.owner_shortcode;
+          if (parseInt(context.question.id, 10)) {
+            // a valid ID is given after resolve
+
+            // DB Action here!
+            await helper.editQuestion(context.question.id, data.question, function(c, d) {
+              if (c === 0) {
+                context.question = d.attributes;
+                context.edited = true;
+              } else {
+                ctx.body = { error: true, data: 'Cannot edit question' }
+              }
+            });
+
+            // Response
+            ctx.body = {
+              error: false,
+              data: context
+            }
+
+          } else {
+            ctx.body = { error: true, data: 'The related question cannot be found' }
+          }
+        } else {
+          ctx.body = { error: true, data: 'This is not your question' }
+        }
+      } else {
+        ctx.body = { error: true, data: 'Invalid data' }
+      }
+    } else {
+      ctx.body = { error: true, data: 'Invalid data' }
     }
 });
 
+// TODO
+// POST - /question/:mixed_shortcode/delete
+
+// POST - /response/:mixed_shortcode/edit
+// POST - /response/:mixed_shortcode/delete
+
+api.post('/question/:mixed_shortcode/delete',
+// Handle request: delete question entity
+async (ctx, next) => {
+    let data = {
+      question: (ctx.request.body.question && ctx.request.body.question != "" ? ctx.request.body.question : -1)
+    }
+    let mixed_shortcode = ctx.params.mixed_shortcode;
+
+    if (mixed_shortcode.length === mixed_shortcode_length) {
+     // Valid length for share_shortcode
+      if (!parseInt(data.question, 10)) {
+        // Valid data
+        let context = {
+          question: {},
+          edited: null
+        }
+        
+        // find share_shortcode
+        let share_shortcode = helper.extractMixed(mixed_shortcode)[1];
+
+        // DB Action here!
+        await helper.getQuestionByShareShortcode(share_shortcode, [], function(c, d){
+          if (c === 0) {
+            context.question = d.attributes;
+            // Delete unused variable (TODO remove columns in bookshelf)
+            
+          } else {
+            ctx.body = { error: true, data: 'Cannot find related question' }
+          }
+        });
+
+        if (context.question.owner_shortcode === helper.extractMixed(mixed_shortcode)[0]) {
+          // question is link to owner_shortcode received in params
+          delete context.question.owner_shortcode;
+          if (parseInt(context.question.id, 10)) {
+            // a valid ID is given after resolve
+
+            // DB Action here!
+            await helper.deleteQuestion(context.question.id, function(c, d) {
+              if (c === 0) {
+                console.log(d);
+                context.deleted = true;
+              } else {
+                ctx.body = { error: true, data: 'Cannot delete question' }
+              }
+            });
+
+            // Response
+            ctx.body = {
+              error: false,
+              data: context
+            }
+
+          } else {
+            ctx.body = { error: true, data: 'The related question cannot be found' }
+          }
+        } else {
+          ctx.body = { error: true, data: 'This is not your question' }
+        }
+      } else {
+        ctx.body = { error: true, data: 'Invalid data' }
+      }
+    } else {
+      ctx.body = { error: true, data: 'Invalid data' }
+    }
+});
 
 
 /* -------------------------------------------------------------------------- */
-//DEBUG ROUTES, TODO DELETE FOR PRODUCTION
+//DEBUG ROUTES, FOR BACK OFFICE
 
 api.get('/questions',
 // Handle request: All questions

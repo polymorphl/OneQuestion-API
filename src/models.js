@@ -25,11 +25,9 @@ var Question = database.Model.extend({
          ['responses', 'owner', 'responses.contributor']
        });
   }),
-  byShare_shortcode: Promise.method(function(share_shortcode) {
+  byShare_shortcode: Promise.method(function(share_shortcode, relations) {
     return this.query({where:{ share_shortcode: share_shortcode }}).fetch(
-      { withRelated:
-        ['responses', 'owner', 'responses.contributor']
-      });
+      { withRelated: relations });
   }),
  /* Relations */
   owner: function() {
@@ -117,7 +115,7 @@ var Owner = database.Model.extend({
 */
 var Contributor = database.Model.extend({
   tableName: 'contributors',
-  idAttribute: 'contributor_shortcode',
+  idAttribute: 'id',
   /* Methods */
   byContributor_shortcode: Promise.method(function(contributor_shortcode) {
      return this.forge().query({where:{ contributor_shortcode: contributor_shortcode }}).fetch();

@@ -93,11 +93,11 @@ html(xmlns='http://www.w3.org/1999/xhtml', xmlns:v='urn:schemas-microsoft-com:vm
                         td(style='word-break:break-word;font-size:0px;padding:10px 25px;', align='justify')
                           div(style='cursor:auto;color:#000;font-family:helvetica;font-size:24px;font-weight:bold;line-height:22px;') Yours links
                       tr
-                        - var sharecodeLink = "http://127.0.0.1:8080/question/" + data.share_shortcode;
+                        - var contributorToken = "http://127.0.0.1:8080/question/" + data.contributor_shortcode;
                         - var mixedcodeLink = "http://127.0.0.1:8080/question/" + data.mixed_shortcode + "/admin";
                         td(style='word-break:break-word;font-size:0px;padding:10px 25px;', align='justify')
                           div(style='cursor:auto;color:#000;font-family:helvetica;font-size:15px;line-height:22px;')
-                            a(href=sharecodeLink) contributor link
+                            a(href=contributorToken) edit link
                             br
                             br
                             a(href=mixedcodeLink) administration link
