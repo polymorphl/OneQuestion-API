@@ -245,26 +245,27 @@ async function editResponse(response_id, response, cb) {
 }
 
 /* DELETE */
+
 async function deleteQuestion(question_id, cb) {
-  // await new Question({id: question_id})
-  // .save({question: question}, {patch: true})
-  // .then(function(question) {
-  //   cb(0, question);
-  // }).catch(function(error) {
-  //   console.log('Question cannot be edited', error);
-  //   cb(1, 'Question cannot be edited');
-  // });
+  await new Question({id: question_id})
+  .save({state: 0}, {patch: true, method: 'update', require: false})
+  .then(function(question) {
+    cb(0, question);
+  }).catch(function(error) {
+    console.log('Question cannot be deleted', error);
+    cb(1, 'Question cannot be deleted');
+  });
 }
 
 async function deleteResponse(delete_id, cb) {
-  // await new Question({id: question_id})
-  // .save({question: question}, {patch: true})
-  // .then(function(question) {
-  //   cb(0, question);
-  // }).catch(function(error) {
-  //   console.log('Question cannot be edited', error);
-  //   cb(1, 'Question cannot be edited');
-  // });
+  await new Question({id: delete_id})
+  .save({state: 0}, {patch: true, method: 'update', require: false})
+  .then(function(response) {
+    cb(0, response);
+  }).catch(function(error) {
+    cb(1, 'response cannot be deleted');
+    console.log('response cannot be deleted', error);
+  });
 }
 
 export default {

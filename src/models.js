@@ -37,7 +37,7 @@ var Question = database.Model.extend({
     return this.hasOne(Contributor);
   },
   responses: function() {
-    return this.hasMany(Response);
+    return this.hasMany(Response).query({where: {state: 1}});
   }
 });
 
@@ -61,10 +61,10 @@ var Response = database.Model.extend({
   }),
   /* Relations */
   contributor: function() {
-    return this.belongsTo(Contributor, 'contributor_shortcode');
+    return this.belongsTo(Contributor, 'id');
   },
   question: function() {
-    return this.belongsTo(Question, 'id');
+    return this.belongsTo(Question, 'id').query({where: {state: 1}});
   }
 });
 
@@ -80,7 +80,6 @@ var Response = database.Model.extend({
 */
 var Owner = database.Model.extend({
   tableName: 'owners',
-  idAttribute: 'id',
   /* Methods */
   byQuestion_id: Promise.method(function(question_id) {
      return this.query({where:{ question_id: question_id }}).fetch({ withRelated:
@@ -115,7 +114,6 @@ var Owner = database.Model.extend({
 */
 var Contributor = database.Model.extend({
   tableName: 'contributors',
-  idAttribute: 'id',
   /* Methods */
   byContributor_shortcode: Promise.method(function(contributor_shortcode) {
      return this.query({where:{ contributor_shortcode: contributor_shortcode }}).fetch();
@@ -128,7 +126,7 @@ var Contributor = database.Model.extend({
   }),
   /* Relations */
   response: function() {
-    return this.belongsTo(Response, 'contributor_shortcode', 'contributor_shortcode');
+    return this.belongsTo(Response, 'id');
   }
 });
 

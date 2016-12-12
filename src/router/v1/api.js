@@ -37,7 +37,7 @@ async (ctx, next) => {
   if (ctx.params.share_shortcode.toString().length === share_shortcode_length) {
     //valid key
     await helper.getQuestionByShareShortcode(ctx.params.share_shortcode,
-    ['responses', 'owner', 'responses.contributor'], function(c, d) {
+    ['responses',  'responses.contributor', 'owner',], function(c, d) {
       if (c === 0) {
         ctx.body  = d;
       }
@@ -387,23 +387,23 @@ async (ctx, next) => {
 });
 
 
-// TODO
-// POST - /question/:mixed_shortcode/delete
+/*
+ { DONE }
+ POST - /question/:mixed_shortcode/delete
+ PARAMS REQUIRED
+  - mixed_shortcode (owner_shortcode + share_shortcode)
+*/
 api.post('/question/:mixed_shortcode/delete',
 // Handle request: delete question entity
 async (ctx, next) => {
-    let data = {
-      question: (ctx.request.body.question && ctx.request.body.question != "" ? ctx.request.body.question : -1)
-    }
     let mixed_shortcode = ctx.params.mixed_shortcode;
 
     if (mixed_shortcode.length === mixed_shortcode_length) {
      // Valid length for share_shortcode
-      if (!parseInt(data.question, 10)) {
-        // Valid data
+
         let context = {
           question: {},
-          edited: null
+          deleted: null
         }
         
         // find share_shortcode
@@ -438,7 +438,7 @@ async (ctx, next) => {
 
             // Response
             ctx.body = {
-              error: false,
+              error: context.deleted ? context.deleted : false,
               data: context
             }
 
@@ -448,17 +448,71 @@ async (ctx, next) => {
         } else {
           ctx.body = { error: true, data: 'This is not your question' }
         }
-      } else {
-        ctx.body = { error: true, data: 'Invalid data' }
-      }
+
     } else {
       ctx.body = { error: true, data: 'Invalid data' }
     }
 });
 
-//TODO
+// { DONE }
 // POST - /response/:mixed_shortcode/delete
+api.post('/response/:mixed_shortcode/delete',
+// Handle request: delete response entity
+async (ctx, next) => {
+    let mixed_shortcode = ctx.params.mixed_shortcode;
 
+    if (mixed_shortcode.length === mixed_shortcode_length) {
+     // Valid length for mixed_shortcode
+
+        let context = {
+          response: {},
+          deleted: null
+        }
+        
+        // find contributor_shortcode
+        let contributor_shortcode = helper.extractMixed(mixed_shortcode)[0];
+        console.log(contributor_shortcode, contributor_shortcode.length)
+
+        // DB Action here!
+        await helper.getResponseByContribShortcode(contributor_shortcode, [], function(c, d){
+          if (c === 0) {
+            context.response = d.attributes;
+          } else {
+            ctx.body = { error: true, data: 'Cannot find related response' }
+          }
+        });
+
+        if (context.response.contributor_shortcode === contributor_shortcode) {
+          // response is link to contributor_shortcode received in params
+          console.log(context.response)
+          if (parseInt(context.response.id, 10)) {
+            // a valid ID is given after resolve
+
+            // DB Action here!
+            await helper.deleteResponse(context.response.id, function(c, d) {
+              if (c === 0) {
+                context.deleted = true;
+              } else {
+                ctx.body = { error: true, data: 'Cannot delete response' }
+              }
+            });
+
+            // Response
+            ctx.body = {
+              error: context.deleted ? context.deleted : false,
+              data: context
+            }
+
+          } else {
+            ctx.body = { error: true, data: 'The related response cannot be found' }
+          }
+        } else {
+          ctx.body = { error: true, data: 'This is not your response' }
+        }
+    } else {
+      ctx.body = { error: true, data: 'Invalid data' }
+    }
+});
 
 /* -------------------------------------------------------------------------- */
 /* DEBUG ROUTES, FOR BACK OFFICE */

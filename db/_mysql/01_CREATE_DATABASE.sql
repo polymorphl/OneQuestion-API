@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS `questions` (
   `owner_shortcode` varchar(32) NOT NULL COMMENT 'owner Shortcode',
   `share_shortcode` varchar(32) NOT NULL COMMENT 'share Shortcode',
   `question` varchar(255) NOT NULL,
+  `state` int(11) NOT NULL DEFAULT 1 COMMENT '0:inactive|1:active',
   `created_at` datetime NOT NULL,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
@@ -24,6 +25,7 @@ CREATE TABLE IF NOT EXISTS `responses` (
   `contributor_shortcode` varchar(32) NOT NULL COMMENT 'contributor Shortcode',
   `response` varchar(255) NOT NULL,
   `created_at` datetime NOT NULL,
+  `state` int(11) NOT NULL DEFAULT 1 COMMENT '0:inactive|1:active',
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
