@@ -20,7 +20,7 @@ var Question = database.Model.extend({
   },
   /* Methods */
   byOwner_shortcode: Promise.method(function(owner_shortcode) {
-     return this.forge().query({where:{ owner_shortcode: owner_shortcode }}).fetch(
+     return this.query({where:{ owner_shortcode: owner_shortcode }}).fetch(
        { withRelated:
          ['responses', 'owner', 'responses.contributor']
        });
@@ -54,10 +54,10 @@ var Response = database.Model.extend({
   tableName: 'responses',
   /* Methods */
   byQuestion_id: Promise.method(function(question_id) {
-     return this.forge().query({where:{ question_id: question_id }}).fetch();
+     return this.query({where:{ question_id: question_id }}).fetch();
   }),
   byContributor_shortcode: Promise.method(function(contributor_shortcode) {
-     return this.forge().query({where:{ contributor_shortcode: contributor_shortcode }}).fetch();
+     return this.query({where:{ contributor_shortcode: contributor_shortcode }}).fetch();
   }),
   /* Relations */
   contributor: function() {
@@ -83,17 +83,17 @@ var Owner = database.Model.extend({
   idAttribute: 'id',
   /* Methods */
   byQuestion_id: Promise.method(function(question_id) {
-     return this.forge().query({where:{ question_id: question_id }}).fetch({ withRelated:
+     return this.query({where:{ question_id: question_id }}).fetch({ withRelated:
        []
      });
   }),
   byOwner_shortcode: Promise.method(function(owner_shortcode) {
-     return this.forge().query({where:{ owner_shortcode: owner_shortcode }}).fetch({ withRelated:
+     return this.query({where:{ owner_shortcode: owner_shortcode }}).fetch({ withRelated:
        []
      });
   }),
   byEmail: Promise.method(function(email) {
-    return this.forge().query({where:{ email: email }}).fetch({ withRelated:
+    return this.query({where:{ email: email }}).fetch({ withRelated:
       []
     });
   }),
@@ -118,17 +118,17 @@ var Contributor = database.Model.extend({
   idAttribute: 'id',
   /* Methods */
   byContributor_shortcode: Promise.method(function(contributor_shortcode) {
-     return this.forge().query({where:{ contributor_shortcode: contributor_shortcode }}).fetch();
+     return this.query({where:{ contributor_shortcode: contributor_shortcode }}).fetch();
   }),
   byResponse_id: Promise.method(function(response_id) {
-    return this.forge().query({where:{ response_id: response_id }}).fetch();
+    return this.query({where:{ response_id: response_id }}).fetch();
   }),
   byEmail: Promise.method(function(email) {
-    return this.forge().query({where:{ email: email }}).fetch();
+    return this.query({where:{ email: email }}).fetch();
   }),
   /* Relations */
   response: function() {
-    return this.belongsTo(Response, 'id');
+    return this.belongsTo(Response, 'contributor_shortcode', 'contributor_shortcode');
   }
 });
 

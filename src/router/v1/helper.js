@@ -65,6 +65,19 @@ async function getResponse(id, cb) {
 
 }
 
+async function getResponseByContribShortcode(id, relations, cb) {
+  await new Response().byContributor_shortcode(id, relations).then(function(data) {
+    if (data && data.attributes && data.attributes.id) {
+      cb(0, data);
+    } else {
+      cb (2, 'no data')
+    }
+  }).catch(function(error) {
+    cb(1, error);
+    console.log('ERROR', error);
+  });
+}
+
 async function getQuestions(cb) {
   await new Question().fetchAll({ withRelated:
     ['responses', 'owner', 'responses.contributor']
@@ -221,7 +234,7 @@ async function editQuestion(question_id, question, cb) {
 }
 
 async function editResponse(response_id, response, cb) {
-  await Response({id: response_id})
+  await new Response({id: response_id})
   .save({response: response}, {patch: true})
   .then(function(response) {
     cb(0, response);
@@ -243,6 +256,17 @@ async function deleteQuestion(question_id, cb) {
   // });
 }
 
+async function deleteResponse(delete_id, cb) {
+  // await new Question({id: question_id})
+  // .save({question: question}, {patch: true})
+  // .then(function(question) {
+  //   cb(0, question);
+  // }).catch(function(error) {
+  //   console.log('Question cannot be edited', error);
+  //   cb(1, 'Question cannot be edited');
+  // });
+}
+
 export default {
   /*util*/
   extractMixed,
@@ -251,6 +275,7 @@ export default {
   getQuestions,
   getQuestionByShareShortcode,
   getResponses,
+  getResponseByContribShortcode,
   getOwners,
   getContributors,
   /*create*/
@@ -262,5 +287,6 @@ export default {
   editQuestion,
   editResponse,
   /*delete*/
-  deleteQuestion
+  deleteQuestion,
+  deleteResponse
 };

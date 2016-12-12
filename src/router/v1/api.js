@@ -22,6 +22,10 @@ const share_shortcode_length = 12;
 const contributor_shortcode_length = 12;
 const mixed_shortcode_length = 24; // ??? Add magic 2 chars on random generated position ?
 
+/* -------------------------------------------------------------------------- */
+/* GET ROUTES */
+/* -------------------------------------------------------------------------- */
+
 /*
   GET - /question/:contributor_shortcode
   PARAMS REQUIRED
@@ -64,6 +68,8 @@ async (ctx, next) => {
   });
 });
 
+/* -------------------------------------------------------------------------- */
+/* POST ROUTES */
 /* -------------------------------------------------------------------------- */
 
 /*
@@ -237,6 +243,7 @@ async (ctx, next) => {
 
 
 /*
+ { DONE }
   POST - /question/:mixed_shortcode/admin'
   PARAMS REQUIRED
   - mixed_shortcode (owner_shortcode + share_shortcode)
@@ -308,12 +315,80 @@ async (ctx, next) => {
     }
 });
 
+
+/*
+ { DONE }
+  POST - /response/:mixed_shortcode/edit'
+  PARAMS REQUIRED
+  - mixed_shortcode (contributor_shortcode + share_shortcode)
+*/
+api.post('/response/:mixed_shortcode/edit',
+// Handle request: edit question entity
+async (ctx, next) => {
+    let data = {
+      response: (ctx.request.body.response && ctx.request.body.response != "" ? ctx.request.body.response : -1)
+    }
+    let mixed_shortcode = ctx.params.mixed_shortcode;
+
+    // TODO find share_shortcode
+    let contributor_shortcode = helper.extractMixed(mixed_shortcode)[0];
+
+    if (mixed_shortcode.length === mixed_shortcode_length) {
+     // Valid length for share_shortcode
+      if (!parseInt(data.response, 10)) {
+        // Valid data
+        let context = {
+          response: {},
+          edited: null
+        }
+
+        // DB Action here!
+        await helper.getResponseByContribShortcode(contributor_shortcode, [], function(c, d){
+          if (c === 0) {
+            context.response = d.attributes;
+          } else {
+            ctx.body = { error: true, data: 'Cannot find related response' }
+          }
+        });
+
+        if (context.response.contributor_shortcode === helper.extractMixed(mixed_shortcode)[0]) {
+          // response is link to contributor_shortcode received in params
+          if (parseInt(context.response.id, 10)) {
+            // a valid ID is given after resolve
+
+            // DB Action here!
+            await helper.editResponse(context.response.id, data.response, function(c, d) {
+              if (c === 0) {
+                context.response = d.attributes;
+                context.edited = true;
+              } else {
+                ctx.body = { error: true, data: 'Cannot edit Response' }
+              }
+            });
+
+            // Response
+            ctx.body = {
+              error: false,
+              data: context
+            }
+
+          } else {
+            ctx.body = { error: true, data: 'The related response cannot be found' }
+          }
+        } else {
+          ctx.body = { error: true, data: 'This is not your response' }
+        }
+      } else {
+        ctx.body = { error: true, data: 'Invalid data' }
+      }
+    } else {
+      ctx.body = { error: true, data: 'Invalid data' }
+    }
+});
+
+
 // TODO
 // POST - /question/:mixed_shortcode/delete
-
-// POST - /response/:mixed_shortcode/edit
-// POST - /response/:mixed_shortcode/delete
-
 api.post('/question/:mixed_shortcode/delete',
 // Handle request: delete question entity
 async (ctx, next) => {
@@ -381,9 +456,13 @@ async (ctx, next) => {
     }
 });
 
+//TODO
+// POST - /response/:mixed_shortcode/delete
+
 
 /* -------------------------------------------------------------------------- */
-//DEBUG ROUTES, FOR BACK OFFICE
+/* DEBUG ROUTES, FOR BACK OFFICE */
+/* -------------------------------------------------------------------------- */
 
 api.get('/questions',
 // Handle request: All questions
