@@ -20,7 +20,8 @@ const randomstringLength = 12;
 const owner_shortcode_length = 12;
 const share_shortcode_length = 12;
 const contributor_shortcode_length = 12;
-const mixed_shortcode_length = 24; // ??? Add magic 2 chars on random generated position ?
+const mixed_shortcode_length = 24;
+// ??? Add magic 2 chars on random generated position ?
 
 /* -------------------------------------------------------------------------- */
 /* GET ROUTES */
@@ -50,22 +51,25 @@ async (ctx, next) => {
   PARAMS REQUIRED
   - :mixed_shortcode
 */
-api.get('/question/:ownerId/admin',
+api.get('/question/:mixed_shortcode/admin',
 // Handle request
 async (ctx, next) => {
-  if (ctx.params.contributorId.toString().length === randomstringLength) {
+  if (ctx.params.mixed_shortcode.toString().length === mixed_shortcode_length) {
     //valid key
+    await new Owner({ contributor_id: ctx.params.mixed_shortcode }).fetch({ withRelated: [{
+      'question': function(qb) {
+        qb.columns('question_id', 'question')
+      }
+    }]}).then(function(data) {
+      let resp = data.models;
+      ctx.body = resp;
+    }).catch(function(error) {
+      console.log('ERR', error);
+    });
+  } else {
+    ctx.body = { error: true, data: 'Invalid data' }
   }
-  await new Owner({ contributor_id: ctx.params.ownerId }).fetch({ withRelated: [{
-    'question': function(qb) {
-      qb.columns('question_id', 'question')
-    }
-  }]}).then(function(data) {
-    let resp = data.models;
-    ctx.body = resp;
-  }).catch(function(error) {
-    console.log('ERR', error);
-  });
+  
 });
 
 /* -------------------------------------------------------------------------- */
@@ -471,7 +475,6 @@ async (ctx, next) => {
         
         // find contributor_shortcode
         let contributor_shortcode = helper.extractMixed(mixed_shortcode)[0];
-        console.log(contributor_shortcode, contributor_shortcode.length)
 
         // DB Action here!
         await helper.getResponseByContribShortcode(contributor_shortcode, [], function(c, d){
@@ -484,7 +487,6 @@ async (ctx, next) => {
 
         if (context.response.contributor_shortcode === contributor_shortcode) {
           // response is link to contributor_shortcode received in params
-          console.log(context.response)
           if (parseInt(context.response.id, 10)) {
             // a valid ID is given after resolve
 

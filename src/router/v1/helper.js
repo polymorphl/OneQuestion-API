@@ -258,7 +258,7 @@ async function deleteQuestion(question_id, cb) {
 }
 
 async function deleteResponse(delete_id, cb) {
-  await new Question({id: delete_id})
+  await new Response({id: delete_id})
   .save({state: 0}, {patch: true, method: 'update', require: false})
   .then(function(response) {
     cb(0, response);
