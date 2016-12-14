@@ -56,8 +56,9 @@ var Response = database.Model.extend({
   byQuestion_id: Promise.method(function(question_id) {
      return this.query({where:{ question_id: question_id }}).fetch();
   }),
-  byContributor_shortcode: Promise.method(function(contributor_shortcode) {
-     return this.query({where:{ contributor_shortcode: contributor_shortcode }}).fetch();
+  byContributor_shortcode: Promise.method(function(contributor_shortcode, relations) {
+     return this.query({where:{ contributor_shortcode: contributor_shortcode }}).fetch(
+       { withRelated: relations });
   }),
   /* Relations */
   contributor: function() {
@@ -115,8 +116,9 @@ var Owner = database.Model.extend({
 var Contributor = database.Model.extend({
   tableName: 'contributors',
   /* Methods */
-  byContributor_shortcode: Promise.method(function(contributor_shortcode) {
-     return this.query({where:{ contributor_shortcode: contributor_shortcode }}).fetch();
+  byContributor_shortcode: Promise.method(function(contributor_shortcode, relations) {
+     return this.query({where:{ contributor_shortcode: contributor_shortcode }}).fetch(
+       { withRelated:relations });
   }),
   byResponse_id: Promise.method(function(response_id) {
     return this.query({where:{ response_id: response_id }}).fetch();

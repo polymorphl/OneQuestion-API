@@ -28,9 +28,9 @@ const mixed_shortcode_length = 24;
 /* -------------------------------------------------------------------------- */
 
 /*
-  GET - /question/:contributor_shortcode
+  GET - /question/:share_shortcode
   PARAMS REQUIRED
-  - :contributor_shortcode
+  - :share_shortcode
 */
 api.get('/question/:share_shortcode',
 // Handle request
@@ -41,6 +41,28 @@ async (ctx, next) => {
     ['responses',  'responses.contributor', 'owner',], function(c, d) {
       if (c === 0) {
         ctx.body  = d;
+      }
+    });
+  }
+});
+
+/*
+  GET - /response/:contributor_shortcode
+  PARAMS REQUIRED
+  - :contributor_shortcode
+*/
+api.get('/response/:contributor_shortcode',
+// Handle request
+async (ctx, next) => {
+  if (ctx.params.contributor_shortcode.toString().length === contributor_shortcode_length) {
+    //valid key
+    await helper.getResponseByContribShortcode(ctx.params.contributor_shortcode,
+   ['contributor', 'question', 'question.responses'], function(c, d) {
+      if (c === 0) {
+        let tmp = d;
+        // TODO delete unwanted columns
+
+        ctx.body  = tmp;
       }
     });
   }
