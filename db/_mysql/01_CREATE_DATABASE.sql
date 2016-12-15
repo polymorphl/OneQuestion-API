@@ -21,7 +21,7 @@ ALTER TABLE  `questions` ADD INDEX (`id`);
 /* responses */
 CREATE TABLE IF NOT EXISTS `responses` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `question_id` varchar(255) NOT NULL COMMENT 'question ID',
+  `question_id` int(11) NOT NULL COMMENT 'question ID',
   `contributor_shortcode` varchar(32) NOT NULL COMMENT 'contributor Shortcode',
   `response` varchar(255) NOT NULL,
   `created_at` datetime NOT NULL,
@@ -34,7 +34,7 @@ ALTER TABLE  `responses` ADD INDEX (`id`);
 /* owners */
 CREATE TABLE IF NOT EXISTS `owners` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `question_id` varchar(32) NOT NULL COMMENT 'question ID',
+  `question_id` int(11) NOT NULL COMMENT 'question ID',
   `owner_shortcode` varchar(32) NOT NULL COMMENT 'owner Shortcode',
   `firstname` VARCHAR(32) NOT NULL DEFAULT "" COMMENT 'First Name',
   `email` varchar(255) NOT NULL,
@@ -47,7 +47,7 @@ ALTER TABLE  `owners` ADD INDEX (`id`);
 /* contributors */
 CREATE TABLE IF NOT EXISTS `contributors` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `response_id` varchar(32) NOT NULL COMMENT 'response ID',
+  `response_id` int(11) NOT NULL COMMENT 'response ID',
   `contributor_shortcode` varchar(32) NOT NULL COMMENT 'contributor Shortcode',
   `email` varchar(255) NOT NULL,
   `firstname` VARCHAR(32) NOT NULL DEFAULT "" COMMENT 'First Name',
