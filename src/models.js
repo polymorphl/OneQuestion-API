@@ -58,7 +58,7 @@ var Response = database.Model.extend({
   }),
   byContributor_shortcode: Promise.method(function(contributor_shortcode, relations) {
      return this.query({where:{ contributor_shortcode: contributor_shortcode }}).fetch(
-       { withRelated: relations });
+       { withRelated: relations, virtuals: false });
   }),
   /* Relations */
   contributor: function() {
@@ -99,7 +99,7 @@ var Owner = database.Model.extend({
   }),
   /* Relations */
   question: function() {
-    return this.belongsTo(Question, 'id');
+    return this.belongsTo(Question, 'id').query({where: {state: 1}});
   }
 });
 
@@ -128,7 +128,7 @@ var Contributor = database.Model.extend({
   }),
   /* Relations */
   response: function() {
-    return this.belongsTo(Response, 'id');
+    return this.belongsTo(Response, 'id').query({where: {state: 1}});
   }
 });
 

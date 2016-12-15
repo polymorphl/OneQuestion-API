@@ -191,7 +191,6 @@ async function createOwner(question_id, owner_shortcode, email, firstname, cb) {
 }
 
 async function createContributor(response_id, contributor_shortcode, email, firstname, cb) {
-  console.log('R', response_id, contributor_shortcode, email, firstname)
   await new Contributor({
     response_id: response_id,
     contributor_shortcode: contributor_shortcode,

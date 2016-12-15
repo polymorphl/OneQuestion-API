@@ -38,7 +38,7 @@ async (ctx, next) => {
   if (ctx.params.share_shortcode.toString().length === share_shortcode_length) {
     //valid key
     await helper.getQuestionByShareShortcode(ctx.params.share_shortcode,
-    ['responses',  'responses.contributor', 'owner',], function(c, d) {
+    ['responses',  'responses.contributor', 'owner'], function(c, d) {
       if (c === 0) {
         ctx.body  = d;
       }
@@ -56,15 +56,28 @@ api.get('/response/:contributor_shortcode',
 async (ctx, next) => {
   if (ctx.params.contributor_shortcode.toString().length === contributor_shortcode_length) {
     //valid key
-    await helper.getResponseByContribShortcode(ctx.params.contributor_shortcode,
-   ['contributor', 'question', 'question.responses'], function(c, d) {
-      if (c === 0) {
-        let tmp = d;
-        // TODO delete unwanted columns
+    let context = {
+      share_shortcode: ''
+    };
 
-        ctx.body  = tmp;
+    await helper.getResponseByContribShortcode(ctx.params.contributor_shortcode,
+    ['question'], function(c, d) {
+      if (c === 0) {
+        let tmp = d.toJSON();
+        context.share_shortcode = tmp.question.share_shortcode;
       }
     });
+
+    await helper.getQuestionByShareShortcode(context.share_shortcode,
+    ['responses',  'responses.contributor', 'owner'], function(c, d) {
+      if (c === 0) {
+          let tmp = d.toJSON();
+          delete tmp.owner.owner_shortcode;
+          delete tmp.owner_shortcode;
+          delete tmp.mixed_shortcode;
+          ctx.body = tmp;
+      }
+    })
   }
 });
 
