@@ -57,13 +57,15 @@ async (ctx, next) => {
   if (ctx.params.contributor_shortcode.toString().length === contributor_shortcode_length) {
     //valid key
     let context = {
-      share_shortcode: ''
+      index_response: '',
+      share_shortcode: '',
     };
 
     await helper.getResponseByContribShortcode(ctx.params.contributor_shortcode,
     ['question'], function(c, d) {
       if (c === 0) {
         let tmp = d.toJSON();
+        context.index_response = tmp.id;
         context.share_shortcode = tmp.question.share_shortcode;
       }
     });
@@ -75,6 +77,7 @@ async (ctx, next) => {
           delete tmp.owner.owner_shortcode;
           delete tmp.owner_shortcode;
           delete tmp.mixed_shortcode;
+          tmp.index_response = context.index_response;
           ctx.body = tmp;
       }
     })
